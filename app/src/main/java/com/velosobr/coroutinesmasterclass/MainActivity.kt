@@ -57,13 +57,14 @@ class MainActivity : ComponentActivity() {
     @OptIn(DelicateCoroutinesApi::class)
     private fun ioDefaultDispatcher() {
         val threads = hashMapOf<Long, String>()
-        val job = GlobalScope.launch(Dispatchers.IO) {
+        val job = GlobalScope.launch(Dispatchers.Default) {
             repeat(100) {
                 launch {
                     threads[Thread.currentThread().id] = Thread.currentThread().name
-                    Log.d("MainActivity", "I'm sleeping $it ...")
-                    Thread.sleep(1000L)
-                    Log.d("MainActivity", "Thread: ${Thread.currentThread().name}")
+
+                    (1..100_000).map {
+                        it * it
+                    }
                 }
             }
         }
