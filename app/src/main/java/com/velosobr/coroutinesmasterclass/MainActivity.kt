@@ -1,6 +1,7 @@
 package com.velosobr.coroutinesmasterclass
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -12,9 +13,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.velosobr.coroutinesmasterclass.ui.theme.CoroutinesMasterClassTheme
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlin.system.measureTimeMillis
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,14 +54,25 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    fun ioDefaultDispatcher() {
-        Dispatchers.Main
-        Dispatchers.Default
-        Dispatchers.IO
+    @OptIn(DelicateCoroutinesApi::class)
+    private fun ioDefaultDispatcher() {
+        val threads = hashMapOf<Long, String>()
+        val job = GlobalScope.launch(Dispatchers.IO) {
+            repeat(100) {
+                launch {
+                    threads[Thread.currentThread().id] = Thread.currentThread().name
+                    Log.d("MainActivity", "I'm sleeping $it ...")
+                    Thread.sleep(1000L)
+                    Log.d("MainActivity", "Thread: ${Thread.currentThread().name}")
+                }
+            }
+        }
 
         GlobalScope.launch {
-            println("Thread: ${Thread.currentThread().name}")
-            launch { println("Thread: ${Thread.currentThread().name}") }
+            val timeMillis = measureTimeMillis {
+                job.join()
+            }
+            Log.d("MainActivity", "Launched  ${threads.keys.size} threads in $timeMillis ms.")
         }
     }
 }
