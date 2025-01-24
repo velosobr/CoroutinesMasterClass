@@ -13,18 +13,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.velosobr.coroutinesmasterclass.ui.theme.CoroutinesMasterClassTheme
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.CoroutineContext
 import kotlin.system.measureTimeMillis
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        ioDefaultDispatcher()
+        unconfinedDispatcher()
 
         setContent {
             CoroutinesMasterClassTheme {
@@ -86,5 +89,21 @@ class MainActivity : ComponentActivity() {
                 // do something on the main thread immediately, without waiting for the current task
             }
         }
+    }
+
+    private fun unconfinedDispatcher() {
+      GlobalScope.launch {
+          withContext(Dispatchers.Main) {
+              Log.d("Thread", "Thread: ${Thread.currentThread().name}")
+              withContext(Dispatchers.Unconfined) {
+                  Log.d("Thread", "Thread: ${Thread.currentThread().name}")
+                  withContext(Dispatchers.IO) {
+                      Log.d("Thread", "Thread: ${Thread.currentThread().name}")
+                  }
+                  Log.d("Thread", "Thread: ${Thread.currentThread().name}")
+              }
+          }
+      }
+
     }
 }
