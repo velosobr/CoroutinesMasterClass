@@ -17,6 +17,7 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.system.measureTimeMillis
 
 class MainActivity : ComponentActivity() {
@@ -74,6 +75,16 @@ class MainActivity : ComponentActivity() {
                 job.join()
             }
             Log.d("MainActivity", "Launched  ${threads.keys.size} threads in $timeMillis ms.")
+        }
+    }
+
+    private suspend fun mainDispatcher(){
+        withContext(Dispatchers.Main){
+            // do something on the main thread as soon as possible after the current task
+
+            withContext(Dispatchers.Main.immediate){
+                // do something on the main thread immediately, without waiting for the current task
+            }
         }
     }
 }
