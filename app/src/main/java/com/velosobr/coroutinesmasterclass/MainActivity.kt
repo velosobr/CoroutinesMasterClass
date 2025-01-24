@@ -12,21 +12,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.velosobr.coroutinesmasterclass.ui.theme.CoroutinesMasterClassTheme
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
-        GlobalScope.launch {
-           repeat(100) {
-               delay(500L)
-               println("Coroutine1 running")
-
-        }
+        ioDefaultDispatcher()
 
         setContent {
             CoroutinesMasterClassTheme {
@@ -38,21 +32,33 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
     }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+    @Composable
+    fun Greeting(name: String, modifier: Modifier = Modifier) {
+        Text(
+            text = "Hello $name!",
+            modifier = modifier
+        )
+    }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    CoroutinesMasterClassTheme {
-        Greeting("Android")
+    @Preview(showBackground = true)
+    @Composable
+    fun GreetingPreview() {
+        CoroutinesMasterClassTheme {
+            Greeting("Android")
+        }
+    }
+
+    fun ioDefaultDispatcher() {
+        Dispatchers.Main
+        Dispatchers.Default
+        Dispatchers.IO
+
+        GlobalScope.launch {
+            println("Thread: ${Thread.currentThread().name}")
+            launch { println("Thread: ${Thread.currentThread().name}") }
+        }
     }
 }
